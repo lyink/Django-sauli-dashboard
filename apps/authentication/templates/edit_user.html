@@ -1,0 +1,112 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}User Form{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Row for Horizontal Buttons -->
+    <div class="row mb-4">
+        <div class="col text-center">
+            <button type="button" class="btn btn-primary mx-2" onclick="window.location.href='{% url 'user_list' %}'">Manage users</button>
+            <button type="button" class="btn btn-secondary mx-2">Button 2</button>
+            <button type="button" class="btn btn-success mx-2">Button 3</button>
+            <button type="button" class="btn btn-warning mx-2">Button 4</button>
+            <button type="button" class="btn btn-danger mx-2">Button 5</button>
+        </div>
+    </div>
+    
+    <!-- Form Container -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="card-title">Register User</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            {{ form.username.label_tag }}
+                            {{ form.username }}
+                            {% for error in form.username.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="form-group">
+                            {{ form.email.label_tag }}
+                            {{ form.email }}
+                            {% for error in form.email.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="form-group">
+                            {{ form.password1.label_tag }}
+                            {{ form.password1 }}
+                            {% for error in form.password1.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="form-group">
+                            {{ form.password2.label_tag }}
+                            {{ form.password2 }}
+                            {% for error in form.password2.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="form-group">
+                            <label>Upload Picture</label>
+                            <div class="input-group">
+                                {{ form.profile_pic }}
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="upload-icon" style="cursor: pointer; font-size: 24px; padding: 10px;">
+                                        <i class="fas fa-upload"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            {% for error in form.profile_pic.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="form-group">
+                            <label>Preview</label>
+                            <div id="image-preview" style="max-width: 200px;">
+                                {% if form.instance.profile_pic %}
+                                    <img src="{{ form.instance.profile_pic.url }}" alt="Profile Picture" id="current-image" style="max-width: 100%;">
+                                {% else %}
+                                    <p>No image selected</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.getElementById('upload-icon').addEventListener('click', function() {
+        document.getElementById('{{ form.profile_pic.id_for_label }}').click();
+    });
+
+    document.getElementById('{{ form.profile_pic.id_for_label }}').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('image-preview');
+                preview.innerHTML = `<img src="${e.target.result}" alt="Profile Picture" style="max-width: 100%;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+{% endblock %}

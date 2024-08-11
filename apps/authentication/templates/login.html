@@ -1,0 +1,184 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Page</title>
+    <style>
+        body {
+            background-image: url("{% static 'images/background.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .main-content {
+            width: 50%;
+            border-radius: 20px;
+            box-shadow: 0 5px 5px rgba(0, 0, 0, .4);
+            margin: 10em auto;
+            display: flex;
+            flex-wrap: wrap;
+            background: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+        }
+
+        .company__info {
+            background-color: #008080;
+            border-top-left-radius: 20px;
+            border-bottom-left-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            flex: 1;
+            padding: 2em;
+            text-align: center;
+        }
+
+        .company__logo img {
+            max-width: 150px; /* Adjust as needed */
+            max-height: 150px; /* Adjust as needed */
+            border-radius: 10px; /* Softer corners */
+            object-fit: contain; /* Ensure the image maintains aspect ratio */
+        }
+
+        .fa-android {
+            font-size: 3em;
+        }
+
+        @media screen and (max-width: 640px) {
+            .main-content {
+                width: 90%;
+            }
+            .company__info {
+                display: none;
+            }
+            .login_form {
+                border-top-left-radius: 20px;
+                border-bottom-left-radius: 20px;
+                width: 100%;
+            }
+        }
+
+        @media screen and (min-width: 641px) and (max-width: 800px) {
+            .main-content {
+                width: 70%;
+            }
+        }
+
+        .row > h2 {
+            color: #008080;
+        }
+
+        .login_form {
+            background-color: #fff;
+            border-top-right-radius: 20px;
+            border-bottom-right-radius: 20px;
+            border-top: 1px solid #ccc;
+            border-right: 1px solid #ccc;
+            flex: 1;
+            padding: 2em;
+        }
+
+        form {
+            margin: 0;
+        }
+
+        .form__input {
+            width: 100%;
+            border: 0px solid transparent;
+            border-radius: 50px;
+            border-bottom: 1px solid #aaa;
+            padding: 1em .5em .5em;
+            padding-left: 2em;
+            outline: none;
+            margin: 1.5em auto;
+        }
+
+        .form__input:focus {
+            border-bottom-color: #008080;
+            box-shadow: none;
+            border-radius: 50px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75em 2em;
+            background-color: #008080;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .btn:hover, .btn:focus {
+            background-color: #006666;
+            color: #fff;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="row main-content">
+        <div class="col-md-4 company__info text-center">
+            {% if organization.profile %}
+                <span class="company__logo">
+                    <img src="{{ organization.profile.url }}" alt="Company Logo">
+                </span>
+            {% else %}
+                <h2><span class="fa fa-android"></span></h2>
+            {% endif %}
+            <h4 class="company_title">{{ organization.name }}</h4>
+        </div>
+        <div class="col-md-8 col-xs-12 col-sm-12 login_form">
+            <div class="container-fluid">
+                <div class="row">
+                    <h2 style="text-align: center;">Log In</h2>
+                </div>
+                <div class="row">
+                    <form role="form" method="post" action="">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="bmd-label-floating"><strong>Email</strong></label>
+                                    <input type="email" name="username" class="form__input" placeholder="Email" required>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="bmd-label-floating"><strong>Password</strong></label>
+                                    <input type="password" name="password" class="form__input" placeholder="Password" required>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="button-container">
+                            <button type="submit" name="login" class="btn">Login</button>
+                        </div>
+                        <div class="clearfix"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,193 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Register User{% endblock %}
+
+{% block content %}
+<div class="container-fluid"> <!-- Changed to container-fluid for wider container -->
+    <!-- Row for Horizontal Buttons -->
+    <div class="row mb-4">
+        <div class="col text-center">
+            <button type="button" class="btn btn-primary mx-2" onclick="window.location.href='{% url 'user_list' %}'">Manage users</button>
+            <a href="{% url 'organization_create' %}">
+                <button type="button" class="btn btn-secondary mx-2">register organization</button>
+            </a>
+                        <button type="button" class="btn btn-success mx-2">Button 3</button>
+            <button type="button" class="btn btn-warning mx-2">Button 4</button>
+            <button type="button" class="btn btn-danger mx-2">Button 5</button>
+        </div>
+    </div>
+    
+    <!-- Form Container -->
+    <div class="row justify-content-center">
+        <div class="col-md-10"> <!-- Increased column width -->
+            <div class="card">
+                {% if messages %}
+                {% for message in messages %}
+                  <span class="text-danger">{{ message }}</span>
+                {% endfor %}
+              {% else %}
+    
+              {% endif %}  
+    
+                <div class="card-header bg-primary text-white">
+                    <h4 class="card-title">Register User</h4>
+
+                </div>
+                <div class="card-body">
+                    <form id="user-form" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            {{ form.username.label_tag }}
+                            {{ form.username }}
+                            {% for error in form.username.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="form-group">
+                            {{ form.email.label_tag }}
+                            {{ form.email }}
+                            {% for error in form.email.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="form-group">
+                            {{ form.password1.label_tag }}
+                            {{ form.password1 }}
+                            {% for error in form.password1.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="form-group">
+                            {{ form.password2.label_tag }}
+                            {{ form.password2 }}
+                            {% for error in form.password2.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="form-group">
+                            <label>Upload Picture</label>
+                            <div class="input-group">
+                                {{ form.profile_pic }}
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="upload-icon" style="cursor: pointer; font-size: 24px; padding: 10px;">
+                                        <i class="fas fa-upload"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            {% for error in form.profile_pic.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="form-group">
+                            <label>Preview</label>
+                            <div id="image-preview" style="max-width: 200px;">
+                                {% if form.profile_pic.value %}
+                                    <img src="{{ form.profile_pic.value.url }}" alt="Profile Picture" id="current-image" style="max-width: 100%;">
+                                {% else %}
+                                    <p>No image selected</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            {{ form.user_type.label_tag }}
+                            {{ form.user_type }}
+                            {% for error in form.user_type.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="successModalLabel">Success</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                The user has been registered successfully.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    document.getElementById('upload-icon').addEventListener('click', function() {
+        document.getElementById('{{ form.profile_pic.id_for_label }}').click();
+    });
+
+    document.getElementById('{{ form.profile_pic.id_for_label }}').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('image-preview');
+                preview.innerHTML = `<img src="${e.target.result}" alt="Profile Picture" style="max-width: 100%;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.getElementById('user-form').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const form = this;
+        const formData = new FormData(form);
+
+        fetch('{% url "register_user" %}', { // Adjust URL if needed
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        }).then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  $('#successModal').modal('show'); // Show the success modal
+                  
+                  // Clear form fields
+                  form.reset();
+                  document.getElementById('image-preview').innerHTML = '<p>No image selected</p>';
+              } else {
+                  // Handle errors
+                  if (data.errors) {
+                      for (const field in data.errors) {
+                          const errorContainer = document.querySelector(`#${field}-errors`);
+                          if (errorContainer) {
+                              errorContainer.innerHTML = data.errors[field].map(error => `<div class="text-danger">${error.message}</div>`).join('');
+                          }
+                      }
+                  } else {
+                      alert('An error occurred.');
+                  }
+              }
+          }).catch(error => {
+              console.error('Error:', error);
+          });
+    });
+</script>
+{% endblock %}
